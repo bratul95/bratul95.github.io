@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Psihologie</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .quiz-section {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quiz-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #f39c12, #9b59b6);
+        }
+        
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            flex-grow: 1;
+            margin: 0 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #3498db);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            min-width: 120px;
+        }
+        
+        .question-text {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .option {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .option:hover {
+            background-color: #e9f7fe;
+            border-color: #3498db;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .option.selected {
+            background-color: #d1ecf1;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+        
+        .option-letter {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn:disabled {
+            background: linear-gradient(to right, #bdc3c7, #95a5a6);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-next {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn-next:hover {
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.6);
+        }
+        
+        .results-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+        
+        .score-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .score-text {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .score-value {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #27ae60;
+            margin: 20px 0;
+        }
+        
+        .incorrect-title {
+            text-align: center;
+            margin: 30px 0 20px;
+            color: #e74c3c;
+            font-size: 1.5rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f2f6;
+        }
+        
+        .incorrect-list {
+            list-style-type: none;
+        }
+        
+        .incorrect-item {
+            background-color: #fef5f5;
+            border-left: 4px solid #e74c3c;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .question-result {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .answer-result {
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin: 5px 0;
+            display: inline-block;
+        }
+        
+        .user-answer {
+            background-color: #ffebee;
+            color: #e74c3c;
+        }
+        
+        .correct-answer {
+            background-color: #e8f5e9;
+            color: #2ecc71;
+        }
+        
+        .restart-btn {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            display: block;
+            margin: 30px auto 0;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(155, 89, 182, 0.4);
+        }
+        
+        .restart-btn:hover {
+            box-shadow: 0 6px 15px rgba(155, 89, 182, 0.6);
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .question-text {
+                font-size: 1.2rem;
+            }
+            
+            .progress-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .progress-bar {
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Quiz de Psihologie</h1>
+            <p class="subtitle">Testează-ți cunoștințele despre psihologie</p>
+        </header>
+        
+        <section class="quiz-section" id="quiz-section">
+            <div class="progress-container">
+                <div class="question-number">Întrebarea <span id="current-question">1</span> din <span id="total-questions">30</span></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+            
+            <div class="question-text" id="question-text"></div>
+            
+            <div class="options-container" id="options-container"></div>
+            
+            <div class="navigation">
+                <button class="btn" id="prev-btn" disabled>Înapoi</button>
+                <button class="btn btn-next" id="next-btn">Următoarea</button>
+            </div>
+        </section>
+        
+        <section class="results-container" id="results-container">
+            <div class="score-display">
+                <div class="score-text">Rezultatul tău:</div>
+                <div class="score-value" id="score-value">0/0</div>
+                <p id="score-message"></p>
+            </div>
+            
+            <h3 class="incorrect-title" id="incorrect-title">Întrebări la care ai răspuns greșit</h3>
+            <div id="incorrect-answers"></div>
+            
+            <button class="btn restart-btn" id="restart-btn">Începe din nou</button>
+        </section>
+        
+        <footer class="footer">
+            <p>Quiz realizat pentru evaluarea cunoștințelor de psihologie</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // JSON data embedded directly in the code
+            const quizData = [
+                {
+                    "question_number": "1.1",
+                    "question_text": "Introspecționismul își are originea în:",
+                    "options": {
+                        "a": "Italia;",
+                        "b": "Germania;",
+                        "c": "Franța."
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.2",
+                    "question_text": "În concepția lui S. Freud, inconștientul acționează după:",
+                    "options": {
+                        "a": "principiul plăcerii;",
+                        "b": "principiul realității."
+                    },
+                    "correct_answer": "a"
+                },
+                {
+                    "question_number": "1.3",
+                    "question_text": "„Părintele” psihanalizei este considerat:",
+                    "options": {
+                        "a": "S. Freud;",
+                        "b": "W. Wundt;",
+                        "c": "J. Piaget."
+                    },
+                    "correct_answer": "a"
+                },
+                {
+                    "question_number": "1.4",
+                    "question_text": "În România, profesia de psiholog este reglementată prin:",
+                    "options": {
+                        "a": "Legea nr. 11/2002;",
+                        "b": "Legea nr. 213/2004;",
+                        "c": "Legea nr. 180/2006."
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.5",
+                    "question_text": "Convorbirea care presupune reformularea întrebărilor și adresarea unor întrebări suplimentare se numește:",
+                    "options": {
+                        "a": "convorbire liberă;",
+                        "b": "convorbire standardizată;",
+                        "c": "convorbire semi standardizată"
+                    },
+                    "correct_answer": "c"
+                },
+                {
+                    "question_number": "1.6",
+                    "question_text": "Urmărirea sistematică și intenționată, înregistrarea exactă a manifestărilor comportamentale ale individului și ale contextului situațional al comportamentului poartă denumirea de:",
+                    "options": {
+                        "a": "observație;",
+                        "b": "experiment."
+                    },
+                    "correct_answer": "a"
+                },
+                {
+                    "question_number": "1.7",
+                    "question_text": "În centrul psihologiei umaniste se află:",
+                    "options": {
+                        "a": "omul preprogramat al lui Lorenz, încorsetat în propriile sale instincte;",
+                        "b": "omul proactiv, care se construiește și se autoactualizează;",
+                        "c": "omul divizat al lui Freud, care se zbate între principiul plăcerii și cel al realității."
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.8",
+                    "question_text": "În simptomatica stabilă sunt incluse:",
+                    "options": {
+                        "a": "conduita verbală;",
+                        "b": "conduita mnezică;",
+                        "c": "culoarea ochilor."
+                    },
+                    "correct_answer": "c"
+                },
+                {
+                    "question_number": "1.9",
+                    "question_text": "Behaviorismul acordă un rol important în formarea naturii umane:",
+                    "options": {
+                        "a": "mediului înconjurător;",
+                        "b": "trăsăturilor ereditare."
+                    },
+                    "correct_answer": "a"
+                },
+                {
+                    "question_number": "1.10",
+                    "question_text": "Acțiunile autoplastie sunt acțiuni care:",
+                    "options": {
+                        "a": "modifică organismul;",
+                        "b": "modifică anturajul."
+                    },
+                    "correct_answer": "a"
+                },
+                {
+                    "question_number": "1.11",
+                    "question_text": "În concepția lui P. Janet, studiul conduitei se realizează prin:",
+                    "options": {
+                        "a": "introspecție;",
+                        "b": "metoda clinică."
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.12",
+                    "question_text": "Conceptul de „aparat psihic” a fost introdus de:",
+                    "options": {
+                        "a": "C.G. Jung;",
+                        "b": "W. Wundt;",
+                        "c": "S. Freud."
+                    },
+                    "correct_answer": "c"
+                },
+                {
+                    "question_number": "1.13",
+                    "question_text": "Reamintirea, descrierea și datarea de către subiect a acelor episoade din viața sa care i-au provocat trăiri emoționale puternice constituie:",
+                    "options": {
+                        "a": "metodica „impresii”;",
+                        "b": "metodica „evenimente”."
+                    },
+                    "correct_answer": "a"
+                },
+                {
+                    "question_number": "1.14",
+                    "question_text": "Scoaterea subiectului din ambianța obișnuită de viață și activitate și introducerea într-o ambianță artificială se numește:",
+                    "options": {
+                        "a": "experiment natural;",
+                        "b": "experiment artificial;",
+                        "c": "experiment de laborator."
+                    },
+                    "correct_answer": "c"
+                },
+                {
+                    "question_number": "1.15",
+                    "question_text": "Introducerea între S (stimul) și R (reacție) a unor variabile intermediare (conștiință, maturitate, experiență anterioară, etc.) a fost realizată de:",
+                    "options": {
+                        "a": "J.B. Watson;",
+                        "b": "J.R. Angell;",
+                        "c": "E.C. Tolman."
+                    },
+                    "correct_answer": "c"
+                },
+                {
+                    "question_number": "1.16",
+                    "question_text": "Introspecționiștii situează în centrul psihologiei studiul:",
+                    "options": {
+                        "a": "fenomenelor conștiente;",
+                        "b": "fenomenelor inconștiente;",
+                        "c": "fenomenelor subconștiente."
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.17",
+                    "question_text": "Definiția lui Max Meyer „Psihologia este știința studiată de psihologi” este o definiție tip:",
+                    "options": {
+                        "a": "butadă;",
+                        "b": "metaforă;",
+                        "c": "comprehensivă."
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.18",
+                    "question_text": "Concluzia lui J. Piaget potrivit căreia „psihologia ocupă o poziție centrală nu numai ca produs al tuturor celorlalte științe, ci și ca sursă posibilă de explicație a formării și dezvoltării lor” apare în lucrarea:",
+                    "options": {
+                        "a": "„Principii de psihologie”;",
+                        "b": "„Dimensiuni interdisciplinare ale psihologiei”."
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.19",
+                    "question_text": "Curentul behaviorist se naște în:",
+                    "options": {
+                        "a": "Germania;",
+                        "b": "Franța;",
+                        "c": "S.U.A."
+                    },
+                    "correct_answer": "c"
+                },
+                {
+                    "question_number": "1.20",
+                    "question_text": "Reprimarea poate fi definită ca:",
+                    "options": {
+                        "a": "operație psihică ce tinde să elimine din conștiință un conținut neplăcut;",
+                        "b": "actualizarea unor dorințe inconștiente asupra unor persoane sau obiecte;",
+                        "c": "anxietate față de un pericol extern."
+                    },
+                    "correct_answer": "a"
+                },
+                {
+                    "question_number": "1.21",
+                    "question_text": "Definirea psihologiei ca „știință a inimii” îi aparține lui:",
+                    "options": {
+                        "a": "K.J. Schneider;",
+                        "b": "V. Pavelcu;",
+                        "c": "W. Wundt."
+                    },
+                    "correct_answer": "a"
+                },
+                {
+                    "question_number": "1.22",
+                    "question_text": "Definiția lui W. Wundt „Psihologia este știința experienței imediate, spre deosebire de fizică, care este știința experienței mediate” este o definiție:",
+                    "options": {
+                        "a": "tip butadă;",
+                        "b": "prin negare;",
+                        "c": "comprehensivă;",
+                        "d": "tip metaforă."
+                    },
+                    "correct_answer": "c"
+                },
+                {
+                    "question_number": "1.23",
+                    "question_text": "Structuralismul – ca orientare psihologică, a fost generat de:",
+                    "options": {
+                        "a": "Titchener;",
+                        "b": "James;",
+                        "c": "Angall."
+                    },
+                    "correct_answer": "a"
+                },
+                {
+                    "question_number": "1.24",
+                    "question_text": "Inițiatorul psihologiei conduitei a fost:",
+                    "options": {
+                        "a": "Rubinstein;",
+                        "b": "P. Janet;",
+                        "c": "E.C. Tolman."
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.25",
+                    "question_text": "Potrivit Codului deontologic, enunțul „Profesia de psiholog se exercită în baza atestatului de liberă practică, potrivit treptelor de specializare și specialităților profesionale, atestate de către Colegiu, raportate la competențele profesionale reglementate” este:",
+                    "options": {
+                        "a": "Adevărat",
+                        "b": "Fals"
+                    },
+                    "correct_answer": "a"
+                },
+                {
+                    "question_number": "1.26",
+                    "question_text": "Sintagma „eroarea stimulului” îi aparține lui:",
+                    "options": {
+                        "a": "Wundt;",
+                        "b": "Hall;",
+                        "c": "Titchener."
+                    },
+                    "correct_answer": "c"
+                },
+                {
+                    "question_number": "1.27",
+                    "question_text": "Potrivit Codului deontologic, enunțul „Obligația psihologului de a respecta confidențialitatea este limitată în timp”este:",
+                    "options": {
+                        "a": "Adevărat",
+                        "b": "Fals"
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.28",
+                    "question_text": "Enunțul: „O evaluare psihologică se poate efectua și dacă beneficiarul direct nu și-a dat în scris consimțământul prealabil” este:",
+                    "options": {
+                        "a": "Adevărat",
+                        "b": "Fals"
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.29",
+                    "question_text": "Potrivit Codului deontologic, enunțul „În cazul în care beneficiarul dorește să efectueze o altă examinare psihologică, psihologul examinator inițial poate să efectueze reexaminarea, după cel puțin 72 de ore de la efectuarea examinării psihologice inițiale” este:",
+                    "options": {
+                        "a": "Adevărat",
+                        "b": "Fals"
+                    },
+                    "correct_answer": "b"
+                },
+                {
+                    "question_number": "1.30",
+                    "question_text": "Autorul lucrării „Drama psihologiei”este:",
+                    "options": {
+                        "a": "J. Piaget;",
+                        "b": "C-tin Rădulescu-Motru;",
+                        "c": "V. Pavelcu."
+                    },
+                    "correct_answer": "c"
+                }
+            ];
+
+            // DOM elements
+            const quizSection = document.getElementById('quiz-section');
+            const resultsContainer = document.getElementById('results-container');
+            const questionText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const currentQuestionEl = document.getElementById('current-question');
+            const totalQuestionsEl = document.getElementById('total-questions');
+            const progressFill = document.getElementById('progress-fill');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const scoreValue = document.getElementById('score-value');
+            const scoreMessage = document.getElementById('score-message');
+            const incorrectAnswers = document.getElementById('incorrect-answers');
+            const incorrectTitle = document.getElementById('incorrect-title');
+            const restartBtn = document.getElementById('restart-btn');
+
+            // Quiz state
+            let currentQuestionIndex = 0;
+            let userAnswers = new Array(quizData.length).fill(null);
+            let randomizedQuestions = [];
+            let randomizedOptions = [];
+
+            // Initialize quiz
+            function initQuiz() {
+                // Reset state
+                currentQuestionIndex = 0;
+                userAnswers.fill(null);
+                
+                // Randomize questions
+                randomizedQuestions = [...quizData];
+                shuffleArray(randomizedQuestions);
+                
+                // Randomize options for each question
+                randomizedOptions = randomizedQuestions.map(question => {
+                    const optionsArray = Object.entries(question.options);
+                    shuffleArray(optionsArray);
+                    return Object.fromEntries(optionsArray);
+                });
+                
+                // Update UI
+                totalQuestionsEl.textContent = randomizedQuestions.length;
+                updateQuestion();
+                quizSection.style.display = 'block';
+                resultsContainer.style.display = 'none';
+            }
+
+            // Update question display
+            function updateQuestion() {
+                const question = randomizedQuestions[currentQuestionIndex];
+                const options = randomizedOptions[currentQuestionIndex];
+                
+                // Update question text
+                questionText.textContent = question.question_text;
+                currentQuestionEl.textContent = currentQuestionIndex + 1;
+                
+                // Update progress bar
+                const progress = ((currentQuestionIndex + 1) / randomizedQuestions.length) * 100;
+                progressFill.style.width = `${progress}%`;
+                
+                // Update options
+                optionsContainer.innerHTML = '';
+                Object.entries(options).forEach(([key, value]) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    if (userAnswers[currentQuestionIndex] === key) {
+                        optionElement.classList.add('selected');
+                    }
+                    
+                    optionElement.innerHTML = `
+                        <span class="option-letter">${key.toUpperCase()}</span>
+                        <span class="option-text">${value}</span>
+                    `;
+                    
+                    optionElement.addEventListener('click', () => {
+                        // Deselect all options
+                        document.querySelectorAll('.option').forEach(opt => {
+                            opt.classList.remove('selected');
+                        });
+                        
+                        // Select clicked option
+                        optionElement.classList.add('selected');
+                        userAnswers[currentQuestionIndex] = key;
+                        
+                        // Enable next button if it's disabled
+                        if (nextBtn.disabled) {
+                            nextBtn.disabled = false;
+                        }
+                    });
+                    
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+                // Update navigation buttons
+                prevBtn.disabled = currentQuestionIndex === 0;
+                nextBtn.textContent = currentQuestionIndex === randomizedQuestions.length - 1 ? 'Finalizează' : 'Următoarea';
+            }
+
+            // Show results
+            function showResults() {
+                quizSection.style.display = 'none';
+                resultsContainer.style.display = 'block';
+                
+                // Calculate score
+                let correctCount = 0;
+                const incorrectList = [];
+                
+                randomizedQuestions.forEach((question, index) => {
+                    if (userAnswers[index] === question.correct_answer) {
+                        correctCount++;
+                    } else {
+                        incorrectList.push({
+                            question: question,
+                            userAnswer: userAnswers[index],
+                            correctAnswer: question.correct_answer
+                        });
+                    }
+                });
+                
+                // Display score
+                const percentage = Math.round((correctCount / randomizedQuestions.length) * 100);
+                scoreValue.textContent = `${correctCount}/${randomizedQuestions.length}`;
+                
+                // Display message based on score
+                if (percentage >= 90) {
+                    scoreMessage.textContent = "Excelent! Ai o cunoaștere remarcabilă în domeniul psihologiei.";
+                } else if (percentage >= 70) {
+                    scoreMessage.textContent = "Foarte bine! Ai cunoștințe solide de psihologie.";
+                } else if (percentage >= 50) {
+                    scoreMessage.textContent = "Bun! Ai o bază solidă, dar mai poți învăța câte ceva.";
+                } else {
+                    scoreMessage.textContent = "Poți face mai bine! Revizuiește materia și încearcă din nou.";
+                }
+                
+                // Display incorrect answers
+                incorrectAnswers.innerHTML = '';
+                if (incorrectList.length === 0) {
+                    incorrectTitle.textContent = "Felicitări! Ai răspuns corect la toate întrebările.";
+                } else {
+                    incorrectTitle.textContent = `Întrebări la care ai răspuns greșit (${incorrectList.length}):`;
+                    
+                    incorrectList.forEach(item => {
+                        const incorrectItem = document.createElement('div');
+                        incorrectItem.className = 'incorrect-item';
+                        
+                        incorrectItem.innerHTML = `
+                            <div class="question-result">${item.question.question_number}. ${item.question.question_text}</div>
+                            <div class="answer-result user-answer">Răspunsul tău: ${item.userAnswer ? item.userAnswer.toUpperCase() + ' - ' + item.question.options[item.userAnswer] : 'Nu ai răspuns'}</div>
+                            <div class="answer-result correct-answer">Răspunsul corect: ${item.correctAnswer.toUpperCase()} - ${item.question.options[item.correctAnswer]}</div>
+                        `;
+                        
+                        incorrectAnswers.appendChild(incorrectItem);
+                    });
+                }
+            }
+
+            // Utility function to shuffle an array
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // Event listeners
+            prevBtn.addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    updateQuestion();
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentQuestionIndex < randomizedQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    updateQuestion();
+                } else {
+                    showResults();
+                }
+            });
+
+            restartBtn.addEventListener('click', initQuiz);
+
+            // Initialize the quiz
+            initQuiz();
+        });
+    </script>
+</body>
+</html>
